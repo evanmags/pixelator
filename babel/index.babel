@@ -1,0 +1,157 @@
+const box = (<div className="box"></div>);
+class BtnGroupV extends React.Component{
+  render(){
+  return (<div className="btngroup ud">
+   <div className="button Top">Up</div>
+   <div className="button Bottom">Down</div>
+  </div>)
+}};
+class BtnGroupH extends React.Component{
+  render(){
+  return (<div className="btngroup lr">
+   <div className="button Left">Left</div>
+   <div className="button Right">Right</div>
+  </div>)
+}};
+class Header extends React.Component{
+  render(){
+  return (<nav>
+    <div className="nav-wrapper">
+      <a href="#" className="brand-logo center">Pixelator</a>
+      <ul id="nav-mobile" className="right hide-on-med-and-down">
+        <li><a href="https://github.com/evanmags" target="_blank">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>)
+}};
+class Controls extends React.Component{
+  render(){
+  return (<div className="controls">
+    <BtnGroupV />
+    <div className='buttons'>
+      <input id='color' type='color' defaultValue='#000000' className="button"/>
+      <div id='clear' className="button">Clear</div>
+    </div>      
+    <BtnGroupH />
+  </div>)
+}};
+const body = document.querySelector('.container');
+
+function generate(){
+  let height = (window.innerHeight - 200);
+  let width = (window.innerWidth - 200);
+  let area = width * height;
+  let boxes = width/15 - 1;
+  let rows = height/15;
+  boxList = [];
+  rowList = [];
+  let lastclick;
+  for(x = 0; x < boxes; x++){
+    boxList.push(box);
+  }
+  for(x = 0; x < rows; x++){
+    rowList.push(<div className="row">{boxList}</div>);
+  }
+  ReactDOM.render((
+    <div className='holder'>
+    <Header/>
+    <div className='canvas'>{rowList}</div>
+    <Controls/>
+    </div>
+   ), body);
+  
+}           
+
+function clearBox(){
+  document.querySelectorAll('.box').forEach((box) =>{
+      box.style.background = 'white';
+  })
+}
+
+function moveRight(){
+  const boxes = Array.from(document.querySelectorAll('.box'));
+  const index = boxes.indexOf(lastclick);
+  boxes[index+1].style.background = colorInput.value;
+  lastclick = boxes[index+1];
+}
+
+function moveLeft(){
+  const boxes = Array.from(document.querySelectorAll('.box'));
+  const index = boxes.indexOf(lastclick);
+  boxes[index-1].style.background = colorInput.value;
+  lastclick = boxes[index-1];
+}
+
+function moveUp(){
+  const boxes = Array.from(document.querySelectorAll('.box'));
+  const index = boxes.indexOf(lastclick);
+  const width = (window.innerWidth - 200);
+  const rowlength = Math.floor(width/15);
+  boxes[index-rowlength].style.background = colorInput.value;
+  lastclick = boxes[index-rowlength];
+}
+
+function moveDown(){
+  const boxes = Array.from(document.querySelectorAll('.box'));
+  const index = boxes.indexOf(lastclick);
+  const width = (window.innerWidth - 200);
+  const rowlength = Math.floor(width/15);
+  boxes[index+rowlength].style.background = colorInput.value;
+  lastclick = boxes[index+rowlength];
+}
+
+generate();
+wasResized = false;
+let lastClick;
+let clear = document.querySelector('#clear');
+document.querySelectorAll('.box').forEach((box) =>{
+    box.addEventListener('click', (e)=>{
+      lastclick = box;
+      box.style.background = colorInput.value;
+      return lastclick;
+    })
+  })
+
+window.addEventListener('resize', ()=>{
+  let lastclick = null;
+  generate()
+  document.querySelectorAll('.box').forEach((box) =>{
+    box.addEventListener('click', (e)=>{
+      lastclick = e.target;
+      box.style.background = colorInput.value;
+      return lastclick;
+    })
+  })
+})
+const colorInput = document.querySelector('input[type="color"]');
+
+clear.addEventListener('click', clearBox)
+
+document.querySelector('.Right').addEventListener('click', moveRight)
+
+document.querySelector('.Left').addEventListener('click', moveLeft)
+
+document.querySelector('.Top').addEventListener('click', moveUp)
+
+document.querySelector('.Bottom').addEventListener('click', moveDown)
+
+window.addEventListener('resize', ()=>{
+  generate()
+  const boxes = Array.from(document.querySelectorAll('.box'));
+  document.querySelectorAll('.box').forEach((box) =>{
+    box.addEventListener('click', (e)=>{
+      lastclick = e.target;
+      box.style.background = colorInput.value;
+      return lastclick;
+    })
+  })
+  document.querySelector('.Right').removeEventListener('click', moveRight)
+  document.querySelector('.Left').removeEventListener('click', moveLeft)
+  document.querySelector('.Top').removeEventListener('click', moveUp)
+  document.querySelector('.Bottom').removeEventListener('click', moveDown)
+  
+  document.querySelector('.Right').addEventListener('click', moveRight)
+  document.querySelector('.Left').addEventListener('click', moveLeft)
+  document.querySelector('.Top').addEventListener('click', moveUp)  
+  document.querySelector('.Bottom').addEventListener('click', moveDown)
+})

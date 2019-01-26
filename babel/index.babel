@@ -1,3 +1,4 @@
+//classes and declairations necessary for react
 const box = (<div className="box"></div>);
 class BtnGroupV extends React.Component{
   render(){
@@ -20,6 +21,7 @@ class Header extends React.Component{
       <a href="#" className="brand-logo center">Pixelator</a>
       <ul id="nav-mobile" className="right hide-on-med-and-down">
         <li><a href="https://github.com/evanmags" target="_blank">GitHub</a></li>
+        <li><a href="https://codepen.io/emags112/" target="_blank">Codepen</a></li>
       </ul>
     </div>
   </nav>)
@@ -30,13 +32,18 @@ class Controls extends React.Component{
     <BtnGroupV />
     <div className='buttons'>
       <input id='color' type='color' defaultValue='#000000' className="button"/>
+      <div id='rainbow' className="button">Rainbow</div>
+      <div id='undo' className="button">Undo</div>
       <div id='clear' className="button">Clear</div>
     </div>      
     <BtnGroupH />
   </div>)
 }};
+
+let moves = [];
 const body = document.querySelector('.container');
 
+//react generator function 
 function generate(){
   let height = (window.innerHeight - 200);
   let width = (window.innerWidth - 200);
@@ -59,99 +66,162 @@ function generate(){
     <Controls/>
     </div>
    ), body);
-  
-}           
+} 
 
+//button control functions
 function clearBox(){
   document.querySelectorAll('.box').forEach((box) =>{
       box.style.background = 'white';
   })
+  moves = [];
+}
+
+function log(x){
+  moves.unshift(x)
+  if(moves.length > 20){
+    moves.splice(20, 1);
+  }
+}
+
+function boxClick(e){
+      boxColor()
+      lastclick = e.target;
+      e.target.style.background = color;
+      log(lastclick)
+      return lastclick;
+}
+
+function boxColor(){
+  if(rainbow){
+    return color = `hsl(${hue}, 100%, 50%)`,
+           hue += 5;
+  } else {
+    return color = colorInput.value;
+  }
 }
 
 function moveRight(){
-  const boxes = Array.from(document.querySelectorAll('.box'));
-  const index = boxes.indexOf(lastclick);
-  boxes[index+1].style.background = colorInput.value;
+  boxColor();
+  let boxes = Array.from(document.querySelectorAll('.box'));
+  let index = boxes.indexOf(lastclick);
+  boxes[index+1].style.background = color;
   lastclick = boxes[index+1];
+  log(lastclick)
 }
 
 function moveLeft(){
-  const boxes = Array.from(document.querySelectorAll('.box'));
-  const index = boxes.indexOf(lastclick);
-  boxes[index-1].style.background = colorInput.value;
+  boxColor();
+  let boxes = Array.from(document.querySelectorAll('.box'));
+  let index = boxes.indexOf(lastclick);
+  boxes[index-1].style.background = color;
   lastclick = boxes[index-1];
+  log(lastclick)
 }
 
 function moveUp(){
+  boxColor()
+  let rowlength;
   const boxes = Array.from(document.querySelectorAll('.box'));
   const index = boxes.indexOf(lastclick);
   const width = (window.innerWidth - 200);
-  const rowlength = Math.floor(width/15);
-  boxes[index-rowlength].style.background = colorInput.value;
+  if(width % 15 === 0){
+    rowlength = Math.floor((width - 1) / 15);
+  } else {
+    rowlength = Math.floor(width / 15);
+  }
+  boxes[index-rowlength].style.background = color;
   lastclick = boxes[index-rowlength];
+  log(lastclick)
 }
 
 function moveDown(){
+  boxColor()
+  let rowlength;
   const boxes = Array.from(document.querySelectorAll('.box'));
   const index = boxes.indexOf(lastclick);
   const width = (window.innerWidth - 200);
-  const rowlength = Math.floor(width/15);
-  boxes[index+rowlength].style.background = colorInput.value;
+  if(width % 15 === 0){
+    rowlength = Math.floor((width - 1) / 15);
+  } else {
+    rowlength = Math.floor(width / 15);
+  }
+  boxes[index+rowlength].style.background = color;
   lastclick = boxes[index+rowlength];
+  log(lastclick)
 }
 
+function move(direction){
+  if(ID){ clearInterval(ID) }; 
+  direction(); 
+  return ID = setInterval(direction, 150) 
+}
+
+function undo(){
+  moves[0].style.background = '#fff';
+  moves.shift(0, 1);
+}
+
+
+//init declairations and generations
 generate();
-wasResized = false;
+const colorInput = document.querySelector('input[type="color"]');
+let rainbow = false;
+let hue = 0;
+let color;
 let lastClick;
+let ID;
 let clear = document.querySelector('#clear');
 document.querySelectorAll('.box').forEach((box) =>{
-    box.addEventListener('click', (e)=>{
-      lastclick = box;
-      box.style.background = colorInput.value;
-      return lastclick;
-    })
+    box.addEventListener('click', boxClick); 
   })
-
-window.addEventListener('resize', ()=>{
-  let lastclick = null;
-  generate()
-  document.querySelectorAll('.box').forEach((box) =>{
-    box.addEventListener('click', (e)=>{
-      lastclick = e.target;
-      box.style.background = colorInput.value;
-      return lastclick;
-    })
-  })
-})
-const colorInput = document.querySelector('input[type="color"]');
 
 clear.addEventListener('click', clearBox)
 
-document.querySelector('.Right').addEventListener('click', moveRight)
+document.querySelector('.Right').addEventListener('mousedown', moveRight );
 
-document.querySelector('.Left').addEventListener('click', moveLeft)
 
-document.querySelector('.Top').addEventListener('click', moveUp)
+document.querySelector('.Left').addEventListener('mousedown', moveLeft );
 
-document.querySelector('.Bottom').addEventListener('click', moveDown)
+
+document.querySelector('.Top').addEventListener('mousedown', moveUp );
+
+
+document.querySelector('.Bottom').addEventListener('mousedown', moveDown );
+
+
+document.querySelector('#rainbow').addEventListener('click', () => {
+  rainbow = !rainbow;
+  hue = 0;
+})
+
+document.querySelector('#undo').addEventListener('click', undo)
 
 window.addEventListener('resize', ()=>{
   generate()
   const boxes = Array.from(document.querySelectorAll('.box'));
   document.querySelectorAll('.box').forEach((box) =>{
-    box.addEventListener('click', (e)=>{
-      lastclick = e.target;
-      box.style.background = colorInput.value;
-      return lastclick;
-    })
+     box.removeEventListener('click', boxClick); 
   })
-  document.querySelector('.Right').removeEventListener('click', moveRight)
-  document.querySelector('.Left').removeEventListener('click', moveLeft)
-  document.querySelector('.Top').removeEventListener('click', moveUp)
-  document.querySelector('.Bottom').removeEventListener('click', moveDown)
+  document.querySelectorAll('.box').forEach((box) =>{
+     box.addEventListener('click', boxClick); 
+  })
+  document.querySelector('.Right').removeEventListener('mousedown', moveRight );
+
+  document.querySelector('.Left').removeEventListener('mousedown', moveLeft );
+
+  document.querySelector('.Top').removeEventListener('mousedown', moveUp );
+
+  document.querySelector('.Bottom').removeEventListener('mousedown',  moveDown );
+
   
-  document.querySelector('.Right').addEventListener('click', moveRight)
-  document.querySelector('.Left').addEventListener('click', moveLeft)
-  document.querySelector('.Top').addEventListener('click', moveUp)  
-  document.querySelector('.Bottom').addEventListener('click', moveDown)
+  document.querySelector('.Right').addEventListener('mousedown', moveRight );
+
+
+  document.querySelector('.Left').addEventListener('mousedown', moveLeft );
+
+
+  document.querySelector('.Top').addEventListener('mousedown', moveUp );
+
+
+  document.querySelector('.Bottom').addEventListener('mousedown',  moveDown );
 })

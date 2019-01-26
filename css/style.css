@@ -74,7 +74,7 @@ nav{
   max-width: 600px;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -82,7 +82,7 @@ nav{
   display: flex;
   justify-content: space-around;
   align-items: center;
-  flex:0 1 200px;
+  flex:1 1 200px;
 }
 
 input, button{
@@ -183,7 +183,7 @@ input, button{
   box-shadow: 2px 1px 0px 1px #aaa;
 }
 
-#clear:active{
+#clear:active, #rainbow:active, #undo:active{
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px 1px #aaa;
 }

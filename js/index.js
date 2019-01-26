@@ -1,4 +1,5 @@
-var _createClass = function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};}();function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}function _possibleConstructorReturn(self, call) {if (!self) {throw new ReferenceError("this hasn't been initialised - super() hasn't been called");}return call && (typeof call === "object" || typeof call === "function") ? call : self;}function _inherits(subClass, superClass) {if (typeof superClass !== "function" && superClass !== null) {throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;}var box = React.createElement("div", { className: "box" });var
+var _createClass = function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};}();function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}function _possibleConstructorReturn(self, call) {if (!self) {throw new ReferenceError("this hasn't been initialised - super() hasn't been called");}return call && (typeof call === "object" || typeof call === "function") ? call : self;}function _inherits(subClass, superClass) {if (typeof superClass !== "function" && superClass !== null) {throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;} //classes and declairations necessary for react
+var box = React.createElement("div", { className: "box" });var
 BtnGroupV = function (_React$Component) {_inherits(BtnGroupV, _React$Component);function BtnGroupV() {_classCallCheck(this, BtnGroupV);return _possibleConstructorReturn(this, (BtnGroupV.__proto__ || Object.getPrototypeOf(BtnGroupV)).apply(this, arguments));}_createClass(BtnGroupV, [{ key: "render", value: function render()
     {
       return React.createElement("div", { className: "btngroup ud" },
@@ -31,13 +32,18 @@ Controls = function (_React$Component4) {_inherits(Controls, _React$Component4);
         React.createElement(BtnGroupV, null),
         React.createElement("div", { className: "buttons" },
           React.createElement("input", { id: "color", type: "color", defaultValue: "#000000", className: "button" }),
+          React.createElement("div", { id: "rainbow", className: "button" }, "Rainbow"),
+          React.createElement("div", { id: "undo", className: "button" }, "Undo"),
           React.createElement("div", { id: "clear", className: "button" }, "Clear")),
 
         React.createElement(BtnGroupH, null));
 
     } }]);return Controls;}(React.Component);;
+
+var moves = [];
 var body = document.querySelector('.container');
 
+//react generator function 
 function generate() {
   var height = window.innerHeight - 200;
   var width = window.innerWidth - 200;
@@ -60,99 +66,162 @@ function generate() {
     React.createElement(Controls, null)),
 
   body);
-
 }
 
+//button control functions
 function clearBox() {
   document.querySelectorAll('.box').forEach(function (box) {
     box.style.background = 'white';
   });
+  moves = [];
+}
+
+function log(x) {
+  moves.unshift(x);
+  if (moves.length > 20) {
+    moves.splice(20, 1);
+  }
+}
+
+function boxClick(e) {
+  boxColor();
+  lastclick = e.target;
+  e.target.style.background = color;
+  log(lastclick);
+  return lastclick;
+}
+
+function boxColor() {
+  if (rainbow) {
+    return color = "hsl(" + hue + ", 100%, 50%)",
+    hue += 5;
+  } else {
+    return color = colorInput.value;
+  }
 }
 
 function moveRight() {
+  boxColor();
   var boxes = Array.from(document.querySelectorAll('.box'));
   var index = boxes.indexOf(lastclick);
-  boxes[index + 1].style.background = colorInput.value;
+  boxes[index + 1].style.background = color;
   lastclick = boxes[index + 1];
+  log(lastclick);
 }
 
 function moveLeft() {
+  boxColor();
   var boxes = Array.from(document.querySelectorAll('.box'));
   var index = boxes.indexOf(lastclick);
-  boxes[index - 1].style.background = colorInput.value;
+  boxes[index - 1].style.background = color;
   lastclick = boxes[index - 1];
+  log(lastclick);
 }
 
 function moveUp() {
+  boxColor();
+  var rowlength = void 0;
   var boxes = Array.from(document.querySelectorAll('.box'));
   var index = boxes.indexOf(lastclick);
   var width = window.innerWidth - 200;
-  var rowlength = Math.floor(width / 15);
-  boxes[index - rowlength].style.background = colorInput.value;
+  if (width % 15 === 0) {
+    rowlength = Math.floor((width - 1) / 15);
+  } else {
+    rowlength = Math.floor(width / 15);
+  }
+  boxes[index - rowlength].style.background = color;
   lastclick = boxes[index - rowlength];
+  log(lastclick);
 }
 
 function moveDown() {
+  boxColor();
+  var rowlength = void 0;
   var boxes = Array.from(document.querySelectorAll('.box'));
   var index = boxes.indexOf(lastclick);
   var width = window.innerWidth - 200;
-  var rowlength = Math.floor(width / 15);
-  boxes[index + rowlength].style.background = colorInput.value;
+  if (width % 15 === 0) {
+    rowlength = Math.floor((width - 1) / 15);
+  } else {
+    rowlength = Math.floor(width / 15);
+  }
+  boxes[index + rowlength].style.background = color;
   lastclick = boxes[index + rowlength];
+  log(lastclick);
 }
 
+function move(direction) {
+  if (ID) {clearInterval(ID);};
+  direction();
+  return ID = setInterval(direction, 150);
+}
+
+function undo() {
+  moves[0].style.background = '#fff';
+  moves.shift(0, 1);
+}
+
+
+//init declairations and generations
 generate();
-wasResized = false;
+var colorInput = document.querySelector('input[type="color"]');
+var rainbow = false;
+var hue = 0;
+var color = void 0;
 var lastClick = void 0;
+var ID = void 0;
 var clear = document.querySelector('#clear');
 document.querySelectorAll('.box').forEach(function (box) {
-  box.addEventListener('click', function (e) {
-    lastclick = box;
-    box.style.background = colorInput.value;
-    return lastclick;
-  });
+  box.addEventListener('click', boxClick);
 });
-
-window.addEventListener('resize', function () {
-  var lastclick = null;
-  generate();
-  document.querySelectorAll('.box').forEach(function (box) {
-    box.addEventListener('click', function (e) {
-      lastclick = e.target;
-      box.style.background = colorInput.value;
-      return lastclick;
-    });
-  });
-});
-var colorInput = document.querySelector('input[type="color"]');
 
 clear.addEventListener('click', clearBox);
 
-document.querySelector('.Right').addEventListener('click', moveRight);
+document.querySelector('.Right').addEventListener('mousedown', moveRight);
 
-document.querySelector('.Left').addEventListener('click', moveLeft);
 
-document.querySelector('.Top').addEventListener('click', moveUp);
+document.querySelector('.Left').addEventListener('mousedown', moveLeft);
 
-document.querySelector('.Bottom').addEventListener('click', moveDown);
+
+document.querySelector('.Top').addEventListener('mousedown', moveUp);
+
+
+document.querySelector('.Bottom').addEventListener('mousedown', moveDown);
+
+
+document.querySelector('#rainbow').addEventListener('click', function () {
+  rainbow = !rainbow;
+  hue = 0;
+});
+
+document.querySelector('#undo').addEventListener('click', undo);
 
 window.addEventListener('resize', function () {
   generate();
   var boxes = Array.from(document.querySelectorAll('.box'));
   document.querySelectorAll('.box').forEach(function (box) {
-    box.addEventListener('click', function (e) {
-      lastclick = e.target;
-      box.style.background = colorInput.value;
-      return lastclick;
-    });
+    box.removeEventListener('click', boxClick);
   });
-  document.querySelector('.Right').removeEventListener('click', moveRight);
-  document.querySelector('.Left').removeEventListener('click', moveLeft);
-  document.querySelector('.Top').removeEventListener('click', moveUp);
-  document.querySelector('.Bottom').removeEventListener('click', moveDown);
+  document.querySelectorAll('.box').forEach(function (box) {
+    box.addEventListener('click', boxClick);
+  });
+  document.querySelector('.Right').removeEventListener('mousedown', moveRight);
 
-  document.querySelector('.Right').addEventListener('click', moveRight);
-  document.querySelector('.Left').addEventListener('click', moveLeft);
-  document.querySelector('.Top').addEventListener('click', moveUp);
-  document.querySelector('.Bottom').addEventListener('click', moveDown);
+  document.querySelector('.Left').removeEventListener('mousedown', moveLeft);
+
+  document.querySelector('.Top').removeEventListener('mousedown', moveUp);
+
+  document.querySelector('.Bottom').removeEventListener('mousedown', moveDown);
+
+
+  document.querySelector('.Right').addEventListener('mousedown', moveRight);
+
+
+  document.querySelector('.Left').addEventListener('mousedown', moveLeft);
+
+
+  document.querySelector('.Top').addEventListener('mousedown', moveUp);
+
+
+  document.querySelector('.Bottom').addEventListener('mousedown', moveDown);
 });
